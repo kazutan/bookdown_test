@@ -1,0 +1,94 @@
+---
+title: "Bookdownを用いた図表番号の自動付与と参照のテスト"
+data: "`r format(Sys.time(),'%Y/%m/%d')`"
+output:
+  bookdown::html_document2:
+    number_sections: true
+    toc: true
+    toc_float: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+タイトルの通りの内容です。{bookdown}の手引書は[こちら](https://bookdown.org/yihui/bookdown/)です。単体Rmdでの標記内容については、この手引書の[こちら](https://bookdown.org/yihui/bookdown/a-single-document.html)にあります。
+
+# 必要条件 {#needs}
+
+(予想も含め)以下のものが必要になるかと:
+
+- RStudioのPreview版(たぶん)
+- rmarkdownパッケージ 0.9.6(Github版かも)
+- knitrパッケージ 1.13
+- bookdownパッケージ (現時点でGithub版のみ)
+
+# ポイント {#points}
+
+## ディレクトリ、ファイルについて
+
+多分ですが、プロジェクトをちゃんと専用で準備したほうがいいかも。自分のテスト用ディレクトリでやってたら、番号取得がなんかうまくいきませんでした。もしかしたら単にRStudioを再起動(Rのセッションを再起動)しなきゃいけなかっただけかもしれません。もし番号がうまく付与されず`?.?`とか出てきたら、一旦再起動してみて、それでもダメなら新しいプロジェクトを作って、そこに該当Rmdを設置して試してください。
+
+## 出力形式の指定 {#set-output}
+
+Rmdの冒頭yaml箇所に、いつもなら`output: html_document`とするのですが、これを`output: bookdown::html_document2`としてください。これで自動番号付与のための関数が発動してくれるようになります。
+
+この`bookdown::html_document2()`は`rmarkdown::html_document()`のラッパーで、上記機能を追加してくれるための関数を通過してから`rmarkdown::render()`へと送るようになるっぽいです。なのでその他のyamlオプションについてもそのまま通過して反応してくれるはずです。
+
+なお、yamlオプションで`number_sections: false`とすると、見出しの通し番号は付与されず、図表は単に`1, 2, 3, ...`という通し番号になります。逆に`number_sections: true`とすると、見出しの番号が付与され、図表には`1.1, 1.2, ...`のように、章番号がついた通し番号になります。
+
+## 図表番号の自動付与
+
+`{bookdown}`の手引書を参照してください。図については[こちら](https://bookdown.org/yihui/bookdown/figures.html)、表については[こちら](https://bookdown.org/yihui/bookdown/tables.html)、章・節については[こちら](https://bookdown.org/yihui/bookdown/cross-references.html)をご覧ください。
+
+# 動作テスト {#tests}
+
+以下動作テストしてます。
+
+## 表の通し番号自動付与と参照
+
+とりあえず、以下でテスト。
+
+```{r cars}
+knitr::kable(summary(cars), caption = "hogehoge", booktabs = TRUE)
+```
+
+```{r iris-tan}
+knitr::kable(head(iris), caption = "あいりすたん。")
+```
+
+表\@ref(tab:cars)は`booktabs = TRUE`、表\@ref(tab:iris-tan)は`booktabs = FALSE`でやってみる。
+
+
+## 図の通し番号自動付与と参照
+
+次はプロット。
+
+```{r pres, fig.cap="ほげほげ。", fig.align='center'}
+plot(pressure)
+```
+
+```{r pres2, fig.cap="ほげほげ。", fig.align='center'}
+plot(pressure)
+```
+
+```{r pres3, fig.cap="ほげほげ。", fig.align='center'}
+plot(pressure)
+```
+
+図\@ref(fig:pres)は一番上、図\@ref(fig:pres2)は二段目、図\@ref(fig:pres3)は三段目。
+
+## 章・節の参照
+
+章・節にラベルでの参照をテストしてみます:
+
+- \@ref(needs)章
+- \@ref(points)章
+- \@ref(tests)章
+- \@ref(set-output)の出力形式の指定
+
+事前に各章にラベルを振っており、上記リストはそのラベルを元にリンクを形成してくれます。
+
+こんな感じで、いけました。もしわからないことがあったら、`@kazutan`までお問い合わせください。
+
+Enjoy!
